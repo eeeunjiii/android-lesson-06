@@ -1,0 +1,55 @@
+<html>
+    <body>
+        <h1> 유저 관리 페이지 <a href="/dashboard">(유저 대시보드로 이동)</a></h1>
+        <h3><a href="/admin"> 관리자 대시보드로 이동 </a></h3>
+        <ul id="userList">
+
+        </ul>
+    </body>
+    <script>
+        async function removeUser(userId, successCallback) {
+            await fetch('/api/v1/user/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userId
+                })
+            }).then(response => {
+                if (response.status === 200) {
+                    successCallback();
+                }
+            });
+        }
+
+        async function loadUsers() {
+            const response = await fetch('/api/v1/user/list');
+            const result = await response.json();
+            for (let i = 0; i < result.length; i++) {
+                let li = document.createElement("li");
+                li.appendChild(document.createTextNode(result[i].userId));
+
+                let contentRemoveButton = document.createElement("span");
+                contentRemoveButton.innerHTML = "&nbsp;&nbsp;삭제하기";
+                contentRemoveButton.style.color = "red";
+                contentRemoveButton.style.cursor = "pointer";
+
+                contentRemoveButton.onclick = function () {
+                    removeUser(result[i].userId, function () {
+                        window.location.reload();
+                    });
+                };
+
+                li.appendChild(contentRemoveButton);
+                document.getElementById("userList").appendChild(li);
+            }
+        }
+
+        // 페이지 로드 시, 비동기로 유저 목록을 불러오도록 수정
+        (async () => {
+            await loadUsers();
+        })();
+    </script>
+
+</html>
