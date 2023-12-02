@@ -27,13 +27,12 @@ public class UserDataEndpoint {
 
     // 원래대로라면 리스트를 통해 JSON에서 사용할 수 있는 형태로 변환해야 하지만, 이번 실습에서는 건너뜁니다.
     @PostMapping("/remove")
-    public ResponseEntity<String> removeUser(@RequestBody RemoveUserDto removeUserDto) {
-        String userId = removeUserDto.getUserId();
-        if (userDataService.isUserExists(userId)) {
+    public ResponseEntity<String> removeUser(@RequestBody String userId) {
+        try {
             userDataService.removeUser(userId);
-            return ResponseEntity.ok("User removed successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.OK).body("User removed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing user");
         }
     }
 }
